@@ -1,0 +1,4 @@
+useDynLib(OncoBN, .registration=TRUE)
+exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)
+import(igraph)
