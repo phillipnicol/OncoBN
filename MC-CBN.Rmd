@@ -63,7 +63,7 @@ Generate_Data <- function(graph, theta, N, false_pos, false_neg)
       
       if(length(parents) != 0)
       {
-        if(length(which(Synthetic_Data[i, parents] != 0)) == 0)
+        if(length(which(Synthetic_Data[i, parents] != 0)) != length(parents))
         {
           Synthetic_Data[i, j] = 0
         }
@@ -105,22 +105,22 @@ Generate_Data <- function(graph, theta, N, false_pos, false_neg)
 Let's set theta
 ```{r}
 set.seed(9882771)
-theta <- runif(21, min = 0.25, max = 0.75)
+theta <- runif(21, min = 0.45, max = 0.9)
 ```
 
 Load the packages 
 ```{r}
 library(OncoBN)
-library(TRONCO)
+library(mccbn)
 library(igraph)
 ```
 
 Now for the comparison 
 
 ```{r}
-comparecapri <- function(G, theta, N, fpr, fnr, iters) {
-  troncofp<- c(1:iters)
-  troncofn <- c(1:iters)
+comparemccbn <- function(G, theta, N, fpr, fnr, iters) {
+  cbnfp<- c(1:iters)
+  cbnfn <- c(1:iters)
   dpfn <- c(1:iters)
   dpfp <- c(1:iters)
   
@@ -128,16 +128,22 @@ comparecapri <- function(G, theta, N, fpr, fnr, iters) {
   
   for(i in 1:iters) {
     D <- Generate_Data(t(G), theta, N, fpr, fnr) 
+    D <- as.matrix(D) 
+    
+    fit = learn_network(D)
+    mle_index = which.max(fit$logliks)
+    M <- fit$posets[[mle_index]]
+    M <- M[-1,-1]
+    
+    print(M)
+    
+    cbnfn[i] <- sum(M - G_t  < 0)
+    cbnfp[i] <- sum(G_t - M < 0)
+    
     D <- D[,-1]
-    colnames(D) <- c(1:20)
+    colnames(D) <- c(1:20) 
     
-    Dtronco <- import.genotypes(D)
-    troncomodel <- tronco.capri(Dtronco, silent = TRUE)
-    
-    troncofn[i] <- sum(troncomodel$model$capri_bic$adj.matrix$adj.matrix.fit - G_t  < 0)
-    troncofp[i] <- sum(G_t - troncomodel$model$capri_bic$adj.matrix$adj.matrix.fit  < 0)
-    
-    out <- fitCPN(D, model = "DBN", k = 3, epsilon = min(colMeans(D))/2, verbose = FALSE)
+    out <- fitCPN(D, model = "CBN", k = 3, epsilon = min(colMeans(D))/2, verbose = FALSE)
     graph <- make_directed_graph(out$edgelist)
     M <- as_adjacency_matrix(graph)
     wtindex <- which(rownames(M) == "WT")
@@ -150,8 +156,8 @@ comparecapri <- function(G, theta, N, fpr, fnr, iters) {
   }
   
   returnlist <- list()
-  returnlist[[1]] <- troncofn
-  returnlist[[2]] <- troncofp
+  returnlist[[1]] <- cbnfn
+  returnlist[[2]] <- cbnfp
   returnlist[[3]] <- dpfn
   returnlist[[4]] <- dpfp
   return(returnlist)
