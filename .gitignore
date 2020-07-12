@@ -7,3 +7,4 @@ src/symbols.rds
 .Rhistory
 .RData
 .DS_Store
+*.tiff
