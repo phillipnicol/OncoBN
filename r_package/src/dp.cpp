@@ -28,7 +28,6 @@ int reshifter(int v, int s, int p);
 
 // [[Rcpp::export]]
 Rcpp::List dp(Rcpp::List input) {
-    Rcpp::Rcout << "In and didnt die \n";
     std::vector<int> dims = input["dims"];
     int N = dims[0];
     int p = dims[1];
