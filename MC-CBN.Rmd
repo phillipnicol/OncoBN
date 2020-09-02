@@ -50,14 +50,14 @@ Parents <- function(graph, node)
   return(which(graph[node,] != 0))
 }
 
-Generate_Data <- function(graph, theta, N, false_pos, false_neg)
+Generate_Data <- function(graph, Vseq, theta, N, false_pos, false_neg)
 {
-  V <- nrow(graph)
-  Synthetic_Data <- matrix(1, nrow = N, ncol = V)
+  p <- nrow(graph)
+  Synthetic_Data <- matrix(0, nrow = N, ncol = p)
   
   for(i in 1:N)
   {
-    for(j in 1:V)
+    for(j in Vseq)
     {
       parents <- Parents(graph, j)
       
@@ -80,12 +80,15 @@ Generate_Data <- function(graph, theta, N, false_pos, false_neg)
           }
         }
       }
+      else{
+        Synthetic_Data[i,j]=rbinom(1,1,theta[j])
+      }
     }
   }
   
   for(i in 1:N)
   {
-    for(j in 2:V)
+    for(j in 1:p)
     {
       if(Synthetic_Data[i,j] == 1)
       {
@@ -118,32 +121,45 @@ library(igraph)
 Now for the comparison 
 
 ```{r}
-comparemccbn <- function(G, theta, N, fpr, fnr, iters) {
-  cbnfp<- c(1:iters)
-  cbnfn <- c(1:iters)
-  dpfn <- c(1:iters)
-  dpfp <- c(1:iters)
+comparemccbn <- function(N, fpr, fnr, iters) {
+  cbnprec<- c(1:iters)
+  cbnrecall <- c(1:iters)
+  dpprec <- c(1:iters)
+  dprecall <- c(1:iters)
   
-  G_t <- G[-1,-1]
   
   for(i in 1:iters) {
-    D <- Generate_Data(t(G), theta, N, fpr, fnr) 
-    D <- as.matrix(D) 
+    print(i)
+    D <- matrix(0,nrow = 20, ncol = 20)
+    while(min(colMeans(D)) < 0.05) {
+    theta <- runif(20,min=0.25, max = 0.75)
+    mydag <- randDAG(n=20, d=2, method = "er")
+    mydag <- igraph.from.graphNEL(mydag)
+    Vseq <- topo_sort(mydag)
+  
+    G <- as_adjacency_matrix(mydag)  
+
+  
+    D <- Generate_Data(t(as.matrix(G)), Vseq, theta, N, fpr, fnr)       
+    }
     
-    fit = learn_network(D)
+    colnames(D) <- c(1:20)
+    
+    Dnew <- cbind(1,D)
+    
+    fit = learn_network(as.matrix(Dnew))
     mle_index = which.max(fit$logliks)
     M <- fit$posets[[mle_index]]
     M <- M[-1,-1]
     
-    print(M)
+    fn <- sum(M - G  < 0)
+    fp <- sum(G - M < 0)
     
-    cbnfn[i] <- sum(M - G_t  < 0)
-    cbnfp[i] <- sum(G_t - M < 0)
+    cbnprec[i] <- (sum(G)-fn)/((sum(G)-fn)+fp)
+    cbnrecall[i] <- (sum(G)-fn)/(sum(G))
     
-    D <- D[,-1]
-    colnames(D) <- c(1:20) 
     
-    out <- fitCPN(D, model = "CBN", k = 3, epsilon = min(colMeans(D))/2, verbose = FALSE)
+    out <- fitCPN(D, model = "CBN", k = 5, epsilon = min(colMeans(D))/2, verbose = FALSE)
     graph <- make_directed_graph(out$edgelist)
     M <- as_adjacency_matrix(graph)
     wtindex <- which(rownames(M) == "WT")
@@ -151,15 +167,18 @@ comparemccbn <- function(G, theta, N, fpr, fnr, iters) {
     perm <- order(as.integer(rownames(M)))
     M <- M[perm, perm]
     
-    dpfn[i] <- sum(M - G_t < 0)
-    dpfp[i] <- sum(G_t - M < 0)
+    fn <- sum(M - G < 0)
+    fp <- sum(G - M < 0)
+    
+    dpprec[i] <- (sum(G)-fn)/((sum(G)-fn)+fp)
+    dprecall[i] <- (sum(G)-fn)/(sum(G))
   }
   
   returnlist <- list()
-  returnlist[[1]] <- cbnfn
-  returnlist[[2]] <- cbnfp
-  returnlist[[3]] <- dpfn
-  returnlist[[4]] <- dpfp
+  returnlist[[1]] <- cbnprec
+  returnlist[[2]] <- cbnrecall
+  returnlist[[3]] <- dpprec
+  returnlist[[4]] <- dprecall
   return(returnlist)
 }
 ```
@@ -173,23 +192,21 @@ Now for the experiment
 eta <- c(0.0,0.01,0.02,0.03,0.04,0.05,0.075,0.1,0.15,0.2)
 
 set.seed(9882771)
-caprifp <-  matrix(0, nrow = 100, ncol = length(eta))
-caprifn <- matrix(0, nrow = 100, ncol = length(eta))
-dpfp <- matrix(0, nrow = 100, ncol = length(eta))
-dpfn <- matrix(0, nrow = 100, ncol = length(eta))
+cbnprec <-  matrix(0, nrow = 100, ncol = length(eta))
+cbnrecall <- matrix(0, nrow = 100, ncol = length(eta))
+dpprec <- matrix(0, nrow = 100, ncol = length(eta))
+dprecall <- matrix(0, nrow = 100, ncol = length(eta))
 
 for(i in 1:length(eta)) {
-  mylist <- comparecapri(G, theta, N = 400, fpr = eta[i], fnr = eta[i], iters = 100)
-  caprifn[,i] <- mylist[[1]]
-  caprifp[,i] <- mylist[[2]]
-  dpfn[,i] <- mylist[[3]]
-  dpfp[,i] <- mylist[[4]] 
+  print("NEW")
+  print(i)
+  mylist <- comparemccbn(N = 400, fpr = eta[i], fnr = eta[i], iters = 100)
+  cbnprec[,i] <- mylist[[1]]
+  cbnrecall[,i] <- mylist[[2]]
+  dpprec[,i] <- mylist[[3]]
+  dprecall[,i] <- mylist[[4]] 
 }
 
-write.csv(caprifn, file = "/Users/phillipnicol/Desktop/local_files/caprifn.csv")
-write.csv(caprifp, file = "/Users/phillipnicol/Desktop/local_files/caprifp.csv")
-write.csv(dpfn, file = "/Users/phillipnicol/Desktop/local_files/dpfn.csv")
-write.csv(dpfp, file = "/Users/phillipnicol/Desktop/local_files/dpfp.csv")
 ```
 
 

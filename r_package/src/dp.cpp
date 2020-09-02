@@ -167,7 +167,7 @@ float local_score(int v, int s, std::vector<std::vector<bool> > &DataFrame, floa
     }
 
     float theta = infer_theta(count);
-    return (count.c_and_p)*log(theta) + (count.no_c_and_p)*log(1-theta) + (count.c_and_no_p)*log_epsilon;
+    return count.c_and_p*log(theta) + (count.no_c_and_p)*log(1-theta) + (count.c_and_no_p)*log_epsilon - 0.5*log(DataFrame.size())*S.size();
 }
 
 std::vector<std::vector<float> > get_local_scores(std::vector<std::vector<bool> > &DataFrame, int k, float log_epsilon, std::string model) {
