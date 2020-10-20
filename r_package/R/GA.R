@@ -184,8 +184,9 @@ GA <- function(Data, N=100, MAX_GEN=100, p_mat_c=0.5, p_cx=0.5, p_ba=0.01, p_ea=
   G <- igraph::graph_from_adjacency_matrix(t(Temp[,p]), mode = "directed")
   
   Return_List <- list()
-  Return_List$edgelist <- as.vector(t(igraph::get.edgelist(G)))
-  Return_List$score <- Max_fitness
+  print(G)
+  Return_List[[1]] <- as.vector(t(igraph::get.edgelist(G)))
+  Return_List[[2]] <- Max_fitness
   return(Return_List)
 }
 

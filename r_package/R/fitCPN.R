@@ -14,17 +14,20 @@ fitCPN <- function(df, model = "CBN", algorithm = "DP", k = 3, epsilon = 0.025, 
   #call Rcpp function
   if(algorithm == "DP") {
     results <- dp(input)
+    #add wildtype to dataframe
+    df <- cbind(df, 1)
+    colnames(df)[ncol(df)] <- "WT" 
   }
   else if(algorithm == "GA") {
     results <- GA(df, leaky = epsilon, model = model, suppress = !verbose) 
+    print(results[[1]])
+    #add wildtype to dataframe
+    df <- cbind(1, df)
+    colnames(df)[1] <- "WT" 
   }
   else {
     stop("Invalid algorithm selected.")
   }
-  
-  #add wildtype to dataframe
-  df <- cbind(df, 1)
-  colnames(df)[ncol(df)] <- "WT" 
   
   #format return list
   out <- list()
