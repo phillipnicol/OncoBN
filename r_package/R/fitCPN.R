@@ -15,6 +15,9 @@ fitCPN <- function(df, model = "CBN", algorithm = "DP", k = 3, epsilon = 0.025, 
   if(algorithm == "DP") {
     results <- dp(input)
   }
+  else if(algorithm == "GA") {
+    results <- GA(df, leaky = epsilon, model = model, suppress = !verbose) 
+  }
   else {
     stop("Invalid algorithm selected.")
   }
