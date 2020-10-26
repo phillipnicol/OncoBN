@@ -3,10 +3,8 @@ GA <- function(Data, N=100, MAX_GEN=100, p_mat_c=0.5, p_cx=0.5, p_ba=0.01, p_ea=
 {
   penalty <- "hard"
   print(leaky)
-  if(colMeans(Data)[1] != 1) {
-    warning("The first column of data should be all 1's")
-    Data <- cbind(1,Data)
-  }
+  Data <- cbind(1,Data)
+  colnames(Data)[1] <- "WT"
   
   n <- ncol(Data)
   num_samples <- nrow(Data)
@@ -173,10 +171,6 @@ GA <- function(Data, N=100, MAX_GEN=100, p_mat_c=0.5, p_cx=0.5, p_ba=0.01, p_ea=
     generation = generation + 1
   }
   
-  if(!suppress)
-  {
-    cat("Done! \n")
-  }
   p = invPerm(Max_perm)
   Temp = Max_edge[p,]
   theta <- Infer_Theta(Temp[,p], Node_counts, counts)
