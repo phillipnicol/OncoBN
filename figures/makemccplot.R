@@ -3,12 +3,12 @@
 library(ggplot2)
 library(grDevices)
 
-## A. CBN to DP comparison 
+## A. CBN to DP comparison
 
 
-library(ggplot2) 
+library(ggplot2)
 dpmcc <- readRDS("/Users/phillipnicol/Desktop/local_files/data/CPN_DP_DATA/dpmcc.RDS")
-cbnmcc <- readRDS("/Users/phillipniol/Desktop/local_files/data/CPN_DP_DATA/cbnmcc.RDS")
+cbnmcc <- readRDS("/Users/phillipnicol/Desktop/local_files/data/CPN_DP_DATA/cbnmcc.RDS")
 cbnmcc[is.na(cbnmcc)] <- 0
 eta <- c(0,0.01,0.02,0.03,0.04,0.05,0.075,0.1,0.15,0.2)
 df <- as.data.frame(cbind(eta, apply(dpmcc,2,median), apply(dpmcc, 2, function(x) quantile(x,0.25)),
@@ -25,9 +25,9 @@ supp[1:10] <- "DP"
 supp[11:20] <- "MC-CBN"
 df$Algorithm <- supp
 
-p <- ggplot(df, aes(x =eta, y = Recall, color=Algorithm)) + geom_point(size=1.75) + geom_line()
+p <- ggplot(df, aes(x =eta, y = Recall, color=Algorithm)) + geom_point(size=2.5) + ylim(-0.5,1) + geom_line(size = 1.25)
 p <- p + geom_errorbar(aes(ymin=firstQ, ymax=thirdQ), width = 0.005)
-p <- p + theme_linedraw()
+p <- p + theme_classic()
 p <- p + scale_color_manual(values=c("sienna2","darkblue"))
 p <- p + xlab("Noise level"~(eta))
 p <- p + ylab("MCC")
@@ -36,7 +36,7 @@ p <- p + theme(legend.title = element_text(size=20), axis.title.x = element_text
                legend.text=element_text(size=15))
 print(p)
 
-##B. 
+##B.
 
 dpmcc <- read.csv("/Users/phillipnicol/Desktop/local_files/data/CPN_DP_DATA/dpmcc.csv")
 dpmcc <- dpmcc[,-1]
@@ -56,12 +56,13 @@ supp[1:10] <- "DP"
 supp[11:20] <- "CAPRI"
 df$Algorithm <- supp
 
-p <- ggplot(df, aes(x =eta, y = Recall, color=Algorithm)) + geom_point(size=1.75) + geom_line()
+p <- ggplot(df, aes(x =eta, y = Recall, color=Algorithm)) + geom_point(size=2.5) + geom_line(size = 1.25)
 p <- p + geom_errorbar(aes(ymin=firstQ, ymax=thirdQ), width = 0.005)
-p <- p + theme_linedraw()
+p <- p + theme_classic()
 p <- p + scale_color_manual(values=c("maroon","sienna2"))
 p <- p + xlab("Noise level"~(eta))
 p <- p + ylab("MCC")
+p <- p + ylim(0,1)
 p <- p + theme(legend.title = element_text(size=20), axis.title.x = element_text(size=20), axis.title.y = element_text(size=20),
                axis.text.x = element_text(size=15), axis.text.y = element_text(size=15),
                legend.text=element_text(size=15))
@@ -86,12 +87,13 @@ supp[1:10] <- "DP"
 supp[11:20] <- "CAPRI"
 df$Algorithm <- supp
 
-p <- ggplot(df, aes(x =eta, y = Recall, color=Algorithm)) + geom_point(size=1.75) + geom_line()
+p <- ggplot(df, aes(x =eta, y = Recall, color=Algorithm)) + geom_point(size=2.5) + geom_line(size = 1.25)
 p <- p + geom_errorbar(aes(ymin=firstQ, ymax=thirdQ), width = 0.005)
-p <- p + theme_linedraw()
+p <- p + theme_classic()
 p <- p + scale_color_manual(values=c("maroon", "sienna2"))
 p <- p + xlab("False Positive Rate")
 p <- p + ylab("MCC")
+p <- p + ylim(0,1)
 p <- p + theme(legend.title = element_text(size=20), axis.title.x = element_text(size=20), axis.title.y = element_text(size=20),
                axis.text.x = element_text(size=15), axis.text.y = element_text(size=15),
                legend.text=element_text(size=15))
@@ -119,12 +121,13 @@ supp[1:8] <- "DP"
 supp[9:16] <- "CAPRI"
 df$Algorithm <- supp
 
-p <- ggplot(df, aes(x = avg_deg, y = Recall, color = Algorithm)) + geom_point(size=1.75) + geom_line()
+p <- ggplot(df, aes(x = avg_deg, y = Recall, color = Algorithm)) + geom_point(size=2.5) + geom_line(size=1.25)
 p <- p + geom_errorbar(aes(ymin=firstQ, ymax=thirdQ), width = 0.005)
-p <- p + theme_linedraw()
+p <- p + theme_classic()
 p <- p + scale_color_manual(values=c("maroon", "sienna2"))
 p <- p + xlab("Average degree")
 p <- p + ylab("MCC")
+p <- p + ylim(0,1)
 p <- p + theme(legend.title = element_text(size=20), axis.title.x = element_text(size=20), axis.title.y = element_text(size=20),
                axis.text.x = element_text(size=15), axis.text.y = element_text(size=15),
                legend.text=element_text(size=15))

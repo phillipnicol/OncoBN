@@ -1,5 +1,6 @@
 
-fitCPN <- function(df, model = "CBN", algorithm = "DP", k = 3, epsilon = 0.025, verbose = TRUE) {
+fitCPN <- function(df, model = "CBN", algorithm = "DP", k = 3, 
+                   epsilon = 0.025, ngen=100, popsize=100, verbose = TRUE) {
   input <- list()
   input$df <- t(data.matrix(df))
   input$dims <- dim(df)
@@ -19,7 +20,8 @@ fitCPN <- function(df, model = "CBN", algorithm = "DP", k = 3, epsilon = 0.025, 
     colnames(df)[ncol(df)] <- "WT" 
   }
   else if(algorithm == "GA") {
-    results <- GA(df, leaky = epsilon, model = model, suppress = !verbose) 
+    results <- GA(df, leaky = epsilon, MAX_GEN=ngen, N=popsize,
+                  model = model, suppress = !verbose) 
     print(results[[1]])
     #add wildtype to dataframe
     df <- cbind(1, df)

@@ -2,7 +2,6 @@
 GA <- function(Data, N=100, MAX_GEN=100, p_mat_c=0.5, p_cx=0.5, p_ba=0.01, p_ea=0.05, p_perm_mut=0.01, leaky, model, suppress = FALSE)
 {
   penalty <- "hard"
-  print(leaky)
   Data <- cbind(1,Data)
   colnames(Data)[1] <- "WT"
   
