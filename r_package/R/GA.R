@@ -1,6 +1,5 @@
 
-GA <- function(Data, N=100, MAX_GEN=100, p_mat_c=0.5, p_cx=0.5, p_ba=0.01, p_ea=0.05, p_perm_mut=0.01, leaky, model, suppress = FALSE)
-{
+GA <- function(Data, N=100, MAX_GEN=100, p_mat_c=0.5, p_cx=0.5, p_ba=0.01, p_ea=0.05, p_perm_mut=0.01, leaky, model, suppress = FALSE) {
   penalty <- "hard"
   Data <- cbind(1,Data)
   colnames(Data)[1] <- "WT"
@@ -8,10 +7,10 @@ GA <- function(Data, N=100, MAX_GEN=100, p_mat_c=0.5, p_cx=0.5, p_ba=0.01, p_ea=
   n <- ncol(Data)
   num_samples <- nrow(Data)
   
-  if(!suppress)
-  {
+  if(!suppress) {
     cat("Preparing Data... ...\n")
   }
+  
   Data <- as.matrix(Data)
   Unique_Data <- matrix(0, nrow = 1, ncol = n)
   Unique_Data[1,] = Data[1,]
@@ -56,11 +55,15 @@ GA <- function(Data, N=100, MAX_GEN=100, p_mat_c=0.5, p_cx=0.5, p_ba=0.01, p_ea=
     Mats[[i]] <- Generate_Tree_DAG(n)
   }
   
+  # Sort in decreasing order
+  freqs <- colMeans(Data)
+  initial_perm <- order(freqs, decreasing=TRUE)
+  
   ### The other chromosome will be random permutations
   Perms <- list()
   for(i in 1:N)
   {
-    Perms[[i]] = c(1, sample(2:n, size = n-1, replace = FALSE))
+    Perms[[i]] = initial_perm
     Perms[[i]] = Perm_Repair(Mats[[i]], Perms[[i]])
   }
   
@@ -843,9 +846,6 @@ Parents <- function(graph, node)
 {
   return(which(graph[node,] != 0))
 }
-
-
-
 
 
 #### CODE SPECIFICALLY FOR ME MODEL
