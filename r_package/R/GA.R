@@ -48,11 +48,18 @@ GA <- function(Data, N=100, MAX_GEN=100, p_mat_c=0.5, p_cx=0.5, p_ba=0.01, p_ea=
     cat("Initializing Population ... ... \n")   
   }
   
+  ## Run CAPRI
+  gen <- TRONCO::import.genotypes(Data)
+  capri <- TRONCO::tronco.capri(gen)
+  
+  init_perm <- order(colSums(capri$adj.matrix.prima.facie))
+  init_mat <- capri$adj.matrix.prima.facie[init_perm,init_perm]
+  
   ### Initialize Binary matrix chromosomes
   Mats <- list()
   for(i in 1:N)
   {
-    Mats[[i]] <- Generate_Tree_DAG(n)
+    Mats[[i]] <- init_mat 
   }
   
   # Sort in decreasing order
