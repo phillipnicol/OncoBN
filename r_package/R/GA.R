@@ -285,7 +285,8 @@ Edge_Mutation <- function(M, hard_penalty)
   ### Consider all possible edge additions
   for(i in 3:n)
   {
-    if(sum(M[i,]) < 3 & hard_penalty)
+    #sum(M[i,]) < 3 & hard_penalty
+    if(hard_penalty)
     {
       for(j in 2:(i-1))
       {
