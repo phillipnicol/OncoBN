@@ -1,12 +1,11 @@
 Package: OncoBN
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
-Version: 1.0
-Date: 2020-05-15
-Author: Your Name
-Maintainer: Your Name <your@email.com>
-Description: One paragraph description of what the package does as one or
-        more full sentences.
+Title: OncoBN: Bayesian networks for inferring cancer progression
+Version: 0.1.0
+Date: 2021-04-27
+Author: Phillip B. Nicol 
+Maintainer: Phillip B. Nicol <philnicol740@gmail.com>
+Description: TODO 
 License: GPL (>= 2)
 Imports: Rcpp (>= 1.0.3), igraph
 LinkingTo: Rcpp

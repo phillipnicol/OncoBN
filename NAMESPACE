@@ -1,4 +1,7 @@
 useDynLib(OncoBN, .registration=TRUE)
-exportPattern("^[[:alpha:]]+")
+export(fitCPN,
+bootstrapCPN,
+plotCPN,
+plotBootstrapCPN)
 importFrom(Rcpp, evalCpp)
 import(igraph, Matrix)
