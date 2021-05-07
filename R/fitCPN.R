@@ -1,6 +1,46 @@
-
+#' @title Fit a Bayesian network model to cancer mutation data 
+#' 
+#' @description TODO 
+#' 
+#' @param df A dataframe or matrix of binary mutation data. The columns should be 
+#' mutations and the rows should be patients. 
+#' @param model Whether to fit a network with "conjuctive" interactions (CBN), or
+#' "disjunctive" interactions (DBN). 
+#' @param algorithm The algorithm used to infer the network. Default is
+#' an optimal dynamic programming ("DP") algorithm, which is only feasible when the number of mutations is
+#' smaller than 30. For larger datasets, use the genetic algorithm ("GA"), which 
+#' gives an approximate solution. 
+#' @param k The in-degree bound on the estimated network. 
+#' @param epsilon Penalty term (for mutations not conforming to the estimated network).
+#' Default 
+#' @param ngen For genetic algorithm only: number of generations. 
+#' @param popsize For genetic algorithm only: initial population size. 
+#' @param verbose Whether or not to print to the console. 
+#' 
+#' @return A list with components 
+#' \itemize{
+#' \item \code{edgelist} -  
+#' \item \code{score} - 
+#' } 
+#' 
+#' @details TODO
+#' 
+#' @author Phillip B. Nicol <philnicol740@gmail.com>
+#' 
+#' @examples 
+#' ## Load the example data
+#' data("example")
+#' 
+#' ## Fit a conjunctive Bayesian network (CBN)
+#' out <- fitCPN(example, epsilon=0.01)
+#' 
+#' ## Plot the graph
+#' plotCPN(out)
+#' 
+#' @references TODO 
+#' 
 fitCPN <- function(df, model = "CBN", algorithm = "DP", k = 3, 
-                   epsilon = 0.025, ngen=100, popsize=100, verbose = TRUE) {
+                   epsilon = colMeans(df)/2, ngen=100, popsize=100, verbose = TRUE) {
   input <- list()
   input$df <- t(data.matrix(df))
   input$dims <- dim(df)
