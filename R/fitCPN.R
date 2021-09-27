@@ -1,6 +1,6 @@
 #' @title Fit a Bayesian network model to cancer mutation data 
 #' 
-#' @description TODO 
+#' @description Fit a Bayesian network model to cancer evolution data. 
 #' 
 #' @param df A dataframe or matrix of binary mutation data. The columns should be 
 #' mutations and the rows should be patients. 
@@ -19,11 +19,12 @@
 #' 
 #' @return A list with components 
 #' \itemize{
-#' \item \code{edgelist} -  
-#' \item \code{score} - 
+#' \item \code{edgelist} - A vector of length 2*k listing
+#' the vertices in the k inferred edges.
+#' \item \code{score} - The maximum likelihood value.
+#' \item \code{graph} - The maximum likelihood graph saved as 
+#' an igraph object.
 #' } 
-#' 
-#' @details TODO
 #' 
 #' @author Phillip B. Nicol <philnicol740@gmail.com>
 #' 
@@ -37,8 +38,10 @@
 #' ## Plot the graph
 #' plotCPN(out)
 #' 
-#' @references TODO 
-#' 
+#' @references 
+#' Nicol, PB, Coombes, KR, Deaver, C, Chkrebtii, O, Paul, S, Toland, AE, Asiaee, A. 
+#' Oncogenetic network estimation with disjunctive Bayesian networks. Comp. Sys. Onco. 2021; 1:e1027.
+#'  https://doi.org/10.1002/cso.21027 
 fitCPN <- function(df, model = "CBN", algorithm = "DP", k = 3, 
                    epsilon = colMeans(df)/2, ngen=100, popsize=100, verbose = TRUE) {
   input <- list()
@@ -75,6 +78,7 @@ fitCPN <- function(df, model = "CBN", algorithm = "DP", k = 3,
   out <- list()
   out$edgelist <- sapply(results[[1]], function(x) colnames(df)[x])
   out$score <- results[[2]]
+  out$graph <- igraph::make_directed_graph(out$edgelist)
   return(out)
 }
 

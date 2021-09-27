@@ -4,4 +4,3 @@ bootstrapCPN,
 plotCPN,
 plotBootstrapCPN)
 importFrom(Rcpp, evalCpp)
-import(igraph, Matrix)

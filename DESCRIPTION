@@ -7,6 +7,8 @@ Author: Phillip B. Nicol
 Maintainer: Phillip B. Nicol <philnicol740@gmail.com>
 Description: TODO 
 License: GPL (>= 2)
-Imports: Rcpp (>= 1.0.3), igraph
+Imports: Rcpp (>= 1.0.3),
+	igraph,
+	ggraph
 LinkingTo: Rcpp
 RoxygenNote: 7.1.1
