@@ -20,14 +20,14 @@
 plotCPN <- function(fit) {
   G <- fit$graph
   xy <- igraph::layout.auto(G)
-  V(G)$x <- xy[,1]
-  V(G)$y <- xy[,2]
+  igraph::V(G)$x <- xy[,1]
+  igraph::V(G)$y <- xy[,2]
   
-  p <- ggraph::ggraph(G, "manual", x=V(G)$x,y=V(G)$y)
-  p <- p + ggraph::geom_edge_link(arrow = arrow(length = unit(4, 'mm')), 
-                 end_cap = circle(3, 'mm'))
+  p <- ggraph::ggraph(G, "manual", x=igraph::V(G)$x,y=igraph::V(G)$y)
+  p <- p + ggraph::geom_edge_link(arrow = grid::arrow(length = grid::unit(4, 'mm')), 
+                 end_cap = ggraph::circle(3, 'mm'))
   p <- p + ggraph::geom_node_point(size=5)
-  p <- p+ggraph::geom_node_label(aes(label=name), repel=TRUE)
+  p <- p+ggraph::geom_node_label(ggplot2::aes(label=name), repel=TRUE)
   plot(p)
 }
 

@@ -1,0 +1,51 @@
+---
+title: "Oncogenetic network estimation with Bayesian Networks (OncoBN)"
+author: "R Package version 0.1.0."
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is an R package that implements methods for inferring the temporal order of somatic mutations in cancer.
+
+## Input data
+
+Input data should be somatic mutation data with samples (or patients) in rows and mutations in the columns. The package includes an example dataset:
+
+```{r}
+library(OncoBN)
+data("example")
+head(example)
+```
+
+## Inferring the order of mutations
+
+Use the function `fitCPN()` to fit a Bayesian network to the data. The two model options are conjunctive Bayesian networks (CBN) or disjunctive Bayesian networks (DBN). CBNs assume conjunctive interactions between parent and child nodes (i.e., all parent aberrations must be present in order for the child aberration to occur). DBNs assume disjunctive interactions between parent and child nodes (i.e., at least one of the parent aberrations must be present in order for the child mutation to occur). We can fit both models on the example data:
+
+```{r}
+out.cbn <- fitCPN(example,
+                  model="CBN",
+                  epsilon=0.01)
+```
+
+```{r}
+out.dbn <- fitCPN(example,
+                  model="DBN",
+                  epsilon=0.01)
+```
+
+
+Now we can use `plotCPN()` to see the estimated network:
+
+```{r}
+plotCPN(out.cbn)
+```
+
+```{r}
+plotCPN(out.dbn)
+```
+
+
+

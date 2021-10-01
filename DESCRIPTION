@@ -9,6 +9,8 @@ Description: TODO
 License: GPL (>= 2)
 Imports: Rcpp (>= 1.0.3),
 	igraph,
-	ggraph
+	ggraph,
+	ggplot2,
+	grid
 LinkingTo: Rcpp
 RoxygenNote: 7.1.1
