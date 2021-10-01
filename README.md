@@ -48,7 +48,7 @@ out.cbn <- fitCPN(example,
     ## Finding best sinks ... ...
     ## Finding best ordering ... ... 
     ## Building optimal network ... ... 
-    ## Optimal network with score -1055.06 found in 0.00021 seconds.
+    ## Optimal network with score -1055.06 found in 0.000212 seconds.
 
 ``` r
 out.dbn <- fitCPN(example,
@@ -62,7 +62,12 @@ out.dbn <- fitCPN(example,
     ## Finding best sinks ... ...
     ## Finding best ordering ... ... 
     ## Building optimal network ... ... 
-    ## Optimal network with score -995.454 found in 0.000169 seconds.
+    ## Optimal network with score -995.454 found in 0.000173 seconds.
+
+The `epsilon` parameter determines the penalty applied to samples that
+deviate from the estimated network. We recommend choosing `epsilon` to
+be at most half the prevalence of the least common mutation in the
+dataset.
 
 Now we can use `plotCPN()` to see the estimated network:
 
@@ -77,3 +82,13 @@ plotCPN(out.dbn)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+## References
+
+For a description of the DBN model and corresponding inference
+algorithms, see:
+
+Nicol, P.B., Coombes, K.R., Deaver, C., Chkrebtii, O.A., Paul, S.,
+Toland, A.E., and Asiaee, A. (2021). Oncogenetic network estimation with
+disjunctive Bayesian networks. *Computational and Systems Oncology* Vol
+1(2), pg. 1-e1027. <https://doi.org/10.1002/cso2.1027>.

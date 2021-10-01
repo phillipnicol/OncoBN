@@ -36,6 +36,7 @@ out.dbn <- fitCPN(example,
                   epsilon=0.01)
 ```
 
+The `epsilon` parameter determines the penalty applied to samples that deviate from the estimated network. We recommend choosing `epsilon` to be at most half the prevalence of the least common mutation in the dataset.
 
 Now we can use `plotCPN()` to see the estimated network:
 
@@ -46,6 +47,13 @@ plotCPN(out.cbn)
 ```{r}
 plotCPN(out.dbn)
 ```
+
+## References
+
+For a description of the DBN model and corresponding inference algorithms, see: 
+
+Nicol, P.B., Coombes, K.R., Deaver, C., Chkrebtii, O.A., Paul, S., Toland, A.E., and Asiaee, A. (2021). Oncogenetic network estimation with disjunctive Bayesian networks. *Computational and Systems Oncology* Vol 1(2), pg.\ 1-e1027. [https://doi.org/10.1002/cso2.1027](https://doi.org/10.1002/cso2.1027).
+
 
 
 
