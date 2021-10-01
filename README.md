@@ -48,7 +48,7 @@ out.cbn <- fitCPN(example,
     ## Finding best sinks ... ...
     ## Finding best ordering ... ... 
     ## Building optimal network ... ... 
-    ## Optimal network with score -1055.06 found in 0.000212 seconds.
+    ## Optimal network with score -1055.06 found in 0.000202 seconds.
 
 ``` r
 out.dbn <- fitCPN(example,
@@ -62,7 +62,7 @@ out.dbn <- fitCPN(example,
     ## Finding best sinks ... ...
     ## Finding best ordering ... ... 
     ## Building optimal network ... ... 
-    ## Optimal network with score -995.454 found in 0.000173 seconds.
+    ## Optimal network with score -995.454 found in 0.000176 seconds.
 
 The `epsilon` parameter determines the penalty applied to samples that
 deviate from the estimated network. We recommend choosing `epsilon` to
@@ -82,6 +82,32 @@ plotCPN(out.dbn)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+## Quantifying uncertainty
+
+`fitCPN()` returns a point estimate of the true progression network. To
+quantify uncertainty in this network we can perform resampling to obtain
+bootstrap estimates for the network. This is provided by
+`bootstrapCPN()`:
+
+``` r
+bs <- bootstrapCPN(example,model="DBN")
+
+df <- as.data.frame(cbind(bs$Edges, bs$counts/bs$N))
+df[,3] <- as.numeric(df[,3])
+df
+```
+
+    ##       V1     V2 V3
+    ## 1     WT Mut. A  1
+    ## 2 Mut. A Mut. B  1
+    ## 3 Mut. A Mut. C  1
+    ## 4 Mut. C Mut. D  1
+    ## 5 Mut. B Mut. D  1
+
+In this example we are 100% in each inferred edge. This is usually not
+the case in real data. One can also plot a graph that overlays high
+confidence edges, see `plotBootstrapCPN()`.
 
 ## References
 

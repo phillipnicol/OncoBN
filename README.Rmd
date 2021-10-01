@@ -48,6 +48,20 @@ plotCPN(out.cbn)
 plotCPN(out.dbn)
 ```
 
+## Quantifying uncertainty
+
+`fitCPN()` returns a point estimate of the true progression network. To quantify uncertainty in this network we can perform resampling to obtain bootstrap estimates for the network. This is provided by `bootstrapCPN()`:
+
+```{r}
+bs <- bootstrapCPN(example,model="DBN")
+
+df <- as.data.frame(cbind(bs$Edges, bs$counts/bs$N))
+df[,3] <- as.numeric(df[,3])
+df
+```
+
+In this example we are 100% in each inferred edge. This is usually not the case in real data. One can also plot a graph that overlays high confidence edges, see `plotBootstrapCPN()`. 
+
 ## References
 
 For a description of the DBN model and corresponding inference algorithms, see: 
