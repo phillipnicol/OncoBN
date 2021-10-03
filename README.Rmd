@@ -10,6 +10,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This is an R package that implements methods for inferring the temporal order of somatic mutations in cancer.
 
+## Installation 
+
+Run the following command from the R console:
+
+```{r, eval=FALSE}
+devtools::install_github("phillipnicol/OncoBN")
+```
+
+
 ## Input data
 
 Input data should be somatic mutation data with samples (or patients) in rows and mutations in the columns. The package includes an example dataset:

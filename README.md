@@ -5,6 +5,14 @@ R Package version 0.1.0.
 This is an R package that implements methods for inferring the temporal
 order of somatic mutations in cancer.
 
+## Installation
+
+Run the following command from the R console:
+
+``` r
+devtools::install_github("phillipnicol/OncoBN")
+```
+
 ## Input data
 
 Input data should be somatic mutation data with samples (or patients) in
@@ -48,7 +56,7 @@ out.cbn <- fitCPN(example,
     ## Finding best sinks ... ...
     ## Finding best ordering ... ... 
     ## Building optimal network ... ... 
-    ## Optimal network with score -1055.06 found in 0.000202 seconds.
+    ## Optimal network with score -1055.06 found in 0.000205 seconds.
 
 ``` r
 out.dbn <- fitCPN(example,
@@ -62,7 +70,7 @@ out.dbn <- fitCPN(example,
     ## Finding best sinks ... ...
     ## Finding best ordering ... ... 
     ## Building optimal network ... ... 
-    ## Optimal network with score -995.454 found in 0.000176 seconds.
+    ## Optimal network with score -995.454 found in 0.000179 seconds.
 
 The `epsilon` parameter determines the penalty applied to samples that
 deviate from the estimated network. We recommend choosing `epsilon` to
@@ -75,13 +83,13 @@ Now we can use `plotCPN()` to see the estimated network:
 plotCPN(out.cbn)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 plotCPN(out.dbn)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ## Quantifying uncertainty
 
