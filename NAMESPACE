@@ -4,3 +4,4 @@ bootstrapCPN,
 plotCPN,
 plotBootstrapCPN)
 importFrom(Rcpp, evalCpp)
+importFrom("igraph", "ends", "incident", "make_directed_graph")
