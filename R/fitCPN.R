@@ -1,3 +1,5 @@
+#' @export
+#' 
 #' @title Fit a Bayesian network model to cancer mutation data 
 #' 
 #' @description Fit a Bayesian network model to cancer evolution data. 

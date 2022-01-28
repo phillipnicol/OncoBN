@@ -1,3 +1,5 @@
+#' @export
+#' 
 #' @title Plot a cancer progression network
 #' 
 #' @description This function plots a cancer progression network inferred 
@@ -31,7 +33,7 @@ plotCPN <- function(fit) {
   plot(p)
 }
 
-
+#' @export
 plotBootstrapCPN <- function(bs_out, threshold = 0.5) {
   bestEdges <- bs_out$Edges[bs_out$counts/bs_out$N > threshold,]
 

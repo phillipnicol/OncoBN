@@ -44,6 +44,8 @@ A list with components
 \item \code{edgelist} - A vector of length 2*k listing
 the vertices in the k inferred edges.
 \item \code{score} - The maximum likelihood value.
+\item \code{graph} - The maximum likelihood graph saved as 
+an igraph object.
 }
 }
 \description{

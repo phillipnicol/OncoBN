@@ -5,7 +5,7 @@ Version: 1.0.0
 Date: 2021-10-02
 Author: Phillip B. Nicol 
 Maintainer: Phillip B. Nicol <philnicol740@gmail.com>
-Description: TODO 
+Description: Implements a collection of methods based on Bayesian Networks that are designed to infer the order of mutations during tumorigenesis. 
 License: GPL (>= 2)
 Imports: Rcpp (>= 1.0.3),
 	igraph,

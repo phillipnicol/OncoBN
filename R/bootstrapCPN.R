@@ -1,3 +1,5 @@
+#' @export
+#' 
 #' @title Bootstrap cancer progression networks 
 #' 
 #' @description This function performs a nonparameteric
