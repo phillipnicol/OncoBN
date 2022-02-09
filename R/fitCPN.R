@@ -45,7 +45,7 @@
 #' Oncogenetic network estimation with disjunctive Bayesian networks. Comp. Sys. Onco. 2021; 1:e1027.
 #'  https://doi.org/10.1002/cso.21027 
 fitCPN <- function(df, model = "CBN", algorithm = "DP", k = 3, 
-                   epsilon = colMeans(df)/2, ngen=100, popsize=100, verbose = TRUE) {
+                   epsilon = min(colMeans(df)/2), ngen=100, popsize=100, verbose = TRUE) {
   input <- list()
   input$df <- t(data.matrix(df))
   input$dims <- dim(df)
@@ -81,22 +81,54 @@ fitCPN <- function(df, model = "CBN", algorithm = "DP", k = 3,
   out$edgelist <- sapply(results[[1]], function(x) colnames(df)[x])
   out$score <- results[[2]]
   out$graph <- igraph::make_directed_graph(out$edgelist)
+  out$theta <- unlist(inferTheta(df,out$graph,model)$thetas)
+  out$model <- model
+  out$epsilon <- epsilon
   return(out)
 }
 
-inferTheta <- function(df, fit) {
-  df <- cbind(df, 1)
-  colnames(df)[ncol(df)] <- "WT" 
-  
-  g <- make_directed_graph(fit$edgelist) 
+#' @export
+#' 
+#' @title Compute probability of a given genotype.
+#' 
+#' @description Compute probability of a given genotype.
+#' 
+#' @param fit An object obtained from plotCPN
+#' @param genotype A binary vector with length equal to the 
+#' number of mutations. 
+#' 
+#' @return A scalar value, equal to the probability of the
+#' input genotype under the inferred model parameters.
+#' 
+#' @author Phillip B. Nicol <philnicol740@gmail.com>
+#' 
+#' @examples 
+#' ## TODO
+#' 
+Lik.genotype <- function(fit, genotype) {
+  x <- c(1,genotype)
+  G <- t(as.matrix(as_adjacency_matrix(fit$graph)))
+  theta.in <- c(1,fit$theta)
+  val <- GA_Likelihood(x, G, theta.in, fit$epsilon, fit$model)
+  return(val)
+}
+
+
+
+
+inferTheta <- function(df, g, model="CBN") {
   parent_list <- list()
   theta_list <- list()
-  for(i in 1:(ncol(df) - 1)) {
+  for(i in 1:(ncol(df)-1)) {
     parents <- incident(g, colnames(df)[i], mode = "in")
     parent_list[[i]] <- ends(g, parents)[,1]
-
+    
     p_on <- as.data.frame(df[, parent_list[[i]] ])
-    theta_list[[i]] <- length(which(df[rowSums(p_on) > 0, i] == 1))/nrow(as.data.frame(p_on[rowSums(p_on) > 0, ]))
+    if(model == "DBN") {
+      theta_list[[i]] <- length(which(df[rowSums(p_on) > 0, i] == 1))/nrow(as.data.frame(p_on[rowSums(p_on) > 0, ]))
+    } else if(model == "CBN") {
+      theta_list[[i]] <- length(which(df[rowSums(p_on) == ncol(p_on), i] == 1))/nrow(as.data.frame(p_on[rowSums(p_on) == ncol(p_on), ]))
+    }
     if(theta_list[[i]] > 1) {
       stop(theta_list[[i]])
     }
@@ -106,6 +138,7 @@ inferTheta <- function(df, fit) {
   out$thetas <- theta_list
   return(out)
 }
+
 
 Likelihood <- function(df, graph.fit, epsilon) {
   df <- cbind(df, 1)

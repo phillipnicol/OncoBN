@@ -9,7 +9,7 @@ fitCPN(
   model = "CBN",
   algorithm = "DP",
   k = 3,
-  epsilon = colMeans(df)/2,
+  epsilon = min(colMeans(df)/2),
   ngen = 100,
   popsize = 100,
   verbose = TRUE
