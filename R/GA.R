@@ -663,7 +663,7 @@ GA_Likelihood <- function(x, G, theta, leaky, model)
   for(i in 2:N)
   {
     G_t = G[i,]
-    if(((min(1, sum(G_t * x)) == 1) && model == "DBN") || ((min(1, sum(G_t * x)) == sum(G_t)) && model == "CBN"))
+    if(((min(1, sum(G_t * x)) == 1) && model == "DBN") || ((sum(G_t * x) == sum(G_t)) && model == "CBN"))
     {
       if(x[i] == 1)
       {
