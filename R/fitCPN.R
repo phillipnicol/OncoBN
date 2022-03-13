@@ -63,6 +63,9 @@ fitCPN <- function(df, model = "CBN", algorithm = "DP", k = 3,
     #add wildtype to dataframe
     df <- cbind(df, 1)
     colnames(df)[ncol(df)] <- "WT" 
+    
+    #Scale back likelihood
+    results[[2]] <- results[[2]]+nrow(df)
   }
   else if(algorithm == "GA") {
     results <- GA(df, leaky = epsilon, MAX_GEN=ngen, N=popsize,
@@ -82,8 +85,12 @@ fitCPN <- function(df, model = "CBN", algorithm = "DP", k = 3,
   out$score <- results[[2]]
   out$graph <- igraph::make_directed_graph(out$edgelist)
   out$theta <- unlist(inferTheta(df,out$graph,model)$thetas)
+  ix <- which(colnames(df) == "WT")
+  df <- df[,-ix]
+  names(out$theta) <- colnames(df)
   out$model <- model
   out$epsilon <- epsilon
+  
   return(out)
 }
 
@@ -108,9 +115,31 @@ fitCPN <- function(df, model = "CBN", algorithm = "DP", k = 3,
 Lik.genotype <- function(fit, genotype) {
   x <- c(1,genotype)
   G <- t(as.matrix(as_adjacency_matrix(fit$graph)))
+  order <- rownames(G)
+  ix <- which(order == "WT")
+  order[c(1,ix)] <- order[c(ix,1)]
+  order[2:length(order)] <- colnames(df)
+  G <- G[order,order]
   theta.in <- c(1,fit$theta)
+
   val <- GA_Likelihood(x, G, theta.in, fit$epsilon, fit$model)
   return(val)
+}
+
+LogLik.graph <- function(df, fit) {
+  G <- t(as.matrix(as_adjacency_matrix(fit$graph)))
+  order <- rownames(G)
+  ix <- which(order == "WT")
+  order[c(1,ix)] <- order[c(ix,1)]
+  order[2:length(order)] <- colnames(df)
+  G <- G[order,order]
+  theta.in <- c(1,fit$theta)
+  loglik <- apply(df,1,function(x) {
+    x.in <- c(1,x)
+    print(x.in)
+    logLik(x.in,G,theta.in,fit$epsilon,fit$model)
+  })
+  return(sum(loglik))
 }
 
 
@@ -165,3 +194,35 @@ Likelihood <- function(df, graph.fit, epsilon) {
   return(likelihood)
 }
 
+
+logLik <- function(x,G,theta,epsilon,model) {
+  N <- nrow(G)
+  val <- 0
+  for(i in 2:N)
+  {
+    G_t = G[i,]
+    if(((min(1, sum(G_t * x)) == 1) && model == "DBN") || ((sum(G_t * x) == sum(G_t)) && model == "CBN"))
+    {
+      if(x[i] == 1)
+      {
+        val = val+log(theta[i])
+      }
+      else
+      {
+        val = val+log(1 - theta[i])
+      }
+    }
+    else
+    {
+      if(x[i] == 1)
+      {
+        val = val+log(epsilon)
+      }
+      else
+      {
+        val = val + log(1-epsilon)
+      }
+    }
+  }
+  return(val)
+}

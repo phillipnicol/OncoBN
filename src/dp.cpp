@@ -7,10 +7,10 @@
 #include<Rcpp.h>
 
 struct counts {
-    int c_and_p, c_and_no_p, no_c_and_p;
+    int c_and_p, c_and_no_p, no_c_and_p, no_c_and_no_p;
 };
 
-std::vector<std::vector<float> > get_local_scores(std::vector<std::vector<bool> > &DataFrame, int k, float log_epsilon, std::string model);
+std::vector<std::vector<float> > get_local_scores(std::vector<std::vector<bool> > &DataFrame, int k, float epsilon, std::string model);
 std::vector<std::vector<int> > get_best_parents(std::vector<std::vector<float> > &best_scores, int p);
 std::vector<int> get_best_sinks(int p, std::vector<std::vector<int> > &best_parents, std::vector<std::vector<float> > &local_scores, std::vector<float> &scores);
 std::vector<int> get_best_ordering(int p, std::vector<int> &sinks);
@@ -18,7 +18,7 @@ std::vector<std::vector<int> > get_best_network(int p, std::vector<int> &orderin
 
 float infer_theta(counts count);
 counts get_counts(int v, std::vector<int> S, std::vector<std::vector<bool> > &DataFrame, std::string model);
-float local_score(int v, int s, std::vector<std::vector<bool> > &DataFrame, float log_epsilon, std::string model);
+float local_score(int v, int s, std::vector<std::vector<bool> > &DataFrame, float epsilon, std::string model);
 std::vector<int> int_to_subset(int v, int s, int p);
 bool penalty_check(int s, int k, int p);
 std::vector<int> get_candidate_sinks(int s, int p);
@@ -48,7 +48,6 @@ Rcpp::List dp(Rcpp::List input) {
         Rcpp::stop("Penalty must be in (0,1).");
     }
 
-    float logepsilon = log(epsilon);
 
     if(verbose) {Rcpp::Rcout << "Loading data ... ... \n";}
     int it = 0;
@@ -64,7 +63,7 @@ Rcpp::List dp(Rcpp::List input) {
     start = clock();
 
     if(verbose) {Rcpp::Rcout << "Computing local scores ... ... \n";}
-    std::vector<std::vector<float> > local_scores = get_local_scores(DataFrame, k, logepsilon, model);
+    std::vector<std::vector<float> > local_scores = get_local_scores(DataFrame, k, epsilon, model);
     if(verbose) {Rcpp::Rcout << "Computing best parent sets ... ... \n";}
     std::vector<std::vector<int> > best_parents = get_best_parents(local_scores, p);
 
@@ -155,27 +154,40 @@ counts get_counts(int v, std::vector<int> S, std::vector<std::vector<bool> > &Da
     count.c_and_p = c_and_p;
     count.c_and_no_p = c_and_no_p;
     count.no_c_and_p = no_c_and_p;
+    count.no_c_and_no_p = DataFrame.size()-c_and_p-no_c_and_p-c_and_no_p;
     return count; 
 }
 
-float local_score(int v, int s, std::vector<std::vector<bool> > &DataFrame, float log_epsilon, std::string model) {
+float local_score(int v, int s, std::vector<std::vector<bool> > &DataFrame, float epsilon, std::string model) {
     std::vector<int> S = int_to_subset(v, s, DataFrame[0].size());
     counts count = get_counts(v, S, DataFrame, model);
 
-    if(count.c_and_p == 0 || count.no_c_and_p == 0) {
-        return -std::numeric_limits<float>::infinity();
+    if(count.c_and_p + count.no_c_and_p == 0) {
+      return -std::numeric_limits<float>::infinity();
     }
 
     float theta = infer_theta(count);
-    return count.c_and_p*log(theta) + (count.no_c_and_p)*log(1-theta) + (count.c_and_no_p)*log_epsilon - 0.5*log(DataFrame.size())*S.size();
+
+    float Lik = 0.0; 
+    if(count.c_and_p > 0) {
+        Lik += count.c_and_p*log(theta);
+    } if(count.no_c_and_p > 0) {
+        Lik += (count.no_c_and_p)*log(1-theta);
+    } if(count.c_and_no_p > 0) {
+        Lik += (count.c_and_no_p)*log(epsilon);
+    } if(count.no_c_and_no_p > 0) {
+        Lik += log(1-epsilon)*count.no_c_and_no_p;
+    }
+
+    return Lik; 
 }
 
-std::vector<std::vector<float> > get_local_scores(std::vector<std::vector<bool> > &DataFrame, int k, float log_epsilon, std::string model) {
+std::vector<std::vector<float> > get_local_scores(std::vector<std::vector<bool> > &DataFrame, int k, float epsilon, std::string model) {
     std::vector<std::vector<float > > local_scores(DataFrame[0].size(), std::vector<float>(1 << (DataFrame[0].size() - 1), 0.0));
     for(int i = 0; i < DataFrame[0].size(); ++i) {
         for(int j = 0; j < local_scores[0].size(); ++j) {
             if(penalty_check(j, k, DataFrame[0].size())) {
-                local_scores[i][j] = local_score(i, j, DataFrame, log_epsilon, model);
+                local_scores[i][j] = local_score(i, j, DataFrame, epsilon, model);
             }
             else {
                 local_scores[i][j] = -std::numeric_limits<float>::infinity();
