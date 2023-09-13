@@ -11,6 +11,7 @@ Imports: Rcpp (>= 1.0.3),
 	igraph,
 	ggraph,
 	ggplot2,
-	grid
+	grid,
+	Matrix
 LinkingTo: Rcpp
 RoxygenNote: 7.1.1
